@@ -77,18 +77,23 @@ if __name__ == "__main__":
     npTimes = []
     cpTimes = []
     n = 1
-    for n in range(2,20):
-        equationsList, solutionsList = create_random_problem(n)
-        start_time = time.perf_counter()
-        npsolve = solve_with_np(equationsList, solutionsList)
-        end_time = time.perf_counter()
-        npTimes.append(end_time-start_time)
+    for n in range(2,250):
+        currtime = 0
+        avg = 0
+        for _ in range(0,5):
+            equationsList, solutionsList = create_random_problem(n)
+            start_time = time.perf_counter()
+            npsolve = solve_with_np(equationsList, solutionsList)
+            end_time = time.perf_counter()
+            avg += end_time-start_time
+        avg /= 5
+        npTimes.append(avg)
 
-        constraints, VarList = convert_to_cp(equationsList, solutionsList)
-        start_time = time.perf_counter()
-        cpsolve = solve_with_cp(constraints, VarList, cp.Minimize(0))
-        end_time = time.perf_counter()
-        cpTimes.append(end_time-start_time)
+        # constraints, VarList = convert_to_cp(equationsList, solutionsList)
+        # start_time = time.perf_counter()
+        # cpsolve = solve_with_cp(constraints, VarList, cp.Minimize(0))
+        # end_time = time.perf_counter()
+        # cpTimes.append(end_time-start_time)
         logger.info("finished calculating for n=%d", n)
 
         #logger.info("\nnp solutions:\n" + str(list(npsolve)) + "\ncp solutions:\n" + str(cpsolve) + "\n" + str(np.allclose(np.dot(equationsList, npsolve), solutionsList)) + "\n---------------------")
@@ -96,9 +101,9 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     end_time = time.perf_counter()
 
-    ax.plot(range(n-1), cpTimes, 'green')
+    # ax.plot(range(n-1), cpTimes, 'green')
     ax.plot(range(n-1), npTimes, 'orange')
-    ax.set_title('NP (orange) Vs. CP (green)')
+    ax.set_title('Only NP (for high n)')
 
     plt.show()
 
